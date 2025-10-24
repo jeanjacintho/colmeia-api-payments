@@ -28,7 +28,7 @@ model Customer {
 
 model Charge {
   id            String        @id @default(cuid())
-  ammount       Decimal       @db.Decimal(10, 2)
+  amount        Decimal       @db.Decimal(10, 2)
   currency      String        @default("BRL")
   paymentMethod PaymentMethod
   status        ChargeStatus  @default(PENDING)
@@ -47,7 +47,6 @@ model Charge {
 
 enum PaymentMethod {
   CREDIT_CARD
-  DEBIT_CARD
   PIX
   BOLETO
 }

@@ -3,6 +3,7 @@ import helmet from "helmet";
 import cors from "cors";
 import customerRoutes from "./routes/customerRoutes";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
+import chargeRoutes from "./routes/chargeRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.get("/health", (req, res) => {
 })
 
 app.use('/api/customers', customerRoutes);
+app.use('/api/charges', chargeRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
