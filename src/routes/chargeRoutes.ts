@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { validateBody } from "../middlewares/validation";
 import { createChargeSchema, updateChargeStatusSchema } from "../schemas/validation";
-import { createCharge, getAllCharges, getChargeByCustomer, getChargeById, getChargesByStatus, updateChargeStatus } from "../controllers/chargeController";
+import { createCharge, getAllCharges, getChargeByCustomer, getChargeById, getChargesByStatus, updateChargeStatus, getChargesByFilters } from "../controllers/chargeController";
 
 const router = Router();
 
 router.post('/', validateBody(createChargeSchema), createCharge);
 router.get('/', getAllCharges);
+router.get('/filter', getChargesByFilters);
 router.get('/status/:status', getChargesByStatus);
 router.get('/customer/:id', getChargeByCustomer);
 router.get('/:id', getChargeById);

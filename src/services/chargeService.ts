@@ -193,4 +193,44 @@ export class ChargeService {
 
         return charges;
     }
+
+    async getChargesByFilters(filters: { customerId?: string; status?: ChargeStatus }) {
+        const where: any = {};
+
+        if (filters.customerId) {
+            const customer = await prisma.customer.findUnique({
+                where: {
+                    id: filters.customerId
+                }
+            });
+
+            if (!customer) {
+                throw createError("Cliente não encontrado", 404);
+            }
+
+            where.customerId = filters.customerId;
+        }
+
+        if (filters.status) {
+            where.status = filters.status;
+        }
+
+        const charges = await prisma.charge.findMany({
+            where,
+            include: {
+                customer: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        return charges;
+    }
 }

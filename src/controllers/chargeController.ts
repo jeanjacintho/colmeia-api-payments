@@ -88,3 +88,28 @@ export const getChargesByStatus = async(req: Request, res: Response, next: NextF
         next(error);
     }
 }
+
+export const getChargesByFilters = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const customerId = req.query.customerId as string;
+        const status = req.query.status as any;
+        
+        const filters: { customerId?: string; status?: any } = {};
+        
+        if (customerId) {
+            filters.customerId = customerId;
+        }
+        
+        if (status) {
+            filters.status = status;
+        }
+        
+        const charges = await chargeService.getChargesByFilters(filters);
+        res.json({
+            success: true,
+            data: charges
+        });
+    } catch (error) {
+        next(error);
+    }
+}
