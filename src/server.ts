@@ -1,6 +1,8 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
+import customerRoutes from "./routes/customerRoutes";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +19,11 @@ app.get("/health", (req, res) => {
         uptime: process.uptime()
      });
 })
+
+app.use('/api/customers', customerRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
