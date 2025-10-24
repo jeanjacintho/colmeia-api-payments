@@ -33,6 +33,7 @@ model Charge {
   paymentMethod PaymentMethod
   status        ChargeStatus  @default(PENDING)
   customerId    String
+  chargeHash    String        @unique
   pixData       Json?
   cardData      Json?
   boletoData    Json?

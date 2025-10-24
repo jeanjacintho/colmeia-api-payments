@@ -1,11 +1,51 @@
 import { ChargeStatus, PrismaClient } from "@prisma/client";
 import { CreateChargeBody, UpdateChargeStatusBody } from "../schemas/validation";
 import { createError } from "../middlewares/errorHandler";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
+const generateChargeHash = (data: CreateChargeBody): string => {
+    const hashData = {
+        customerId: data.customerId,
+        amount: data.amount,
+        currency: data.currency,
+        paymentMethod: data.paymentMethod,
+        pixData: data.pixData,
+        cardData: data.cardData,
+        boletoData: data.boletoData,
+        timestamp: new Date().toISOString().slice(0, 16) // YYYY-MM-DDTHH:MM
+    };
+
+    return crypto
+        .createHash('sha256')
+        .update(JSON.stringify(hashData))
+        .digest('hex');
+};
+
 export class ChargeService {
     async createCharge(data: CreateChargeBody) {
+        const chargeHash = generateChargeHash(data);
+
+        const existingCharge = await prisma.charge.findUnique({
+            where: {
+                chargeHash: chargeHash
+            },
+            include: {
+                customer: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+
+        if (existingCharge) {
+            return existingCharge;
+        }
+
         const customer = await prisma.customer.findUnique({
             where: {
                 id: data.customerId
@@ -22,6 +62,7 @@ export class ChargeService {
             paymentMethod: data.paymentMethod,
             customerId: data.customerId,
             status: "PENDING",
+            chargeHash: chargeHash
         }
 
         switch(data.paymentMethod) {
