@@ -42,6 +42,13 @@ export class CustomerService {
         const customer = await prisma.customer.findUnique({
             where: {
                 id
+            },
+            include: {
+                Charges: {
+                    orderBy: {
+                        createdAt: "desc"
+                    }
+                }
             }
         });
 
@@ -61,6 +68,13 @@ export class CustomerService {
                 take: limit,
                 orderBy: {
                     createdAt: "desc"
+                },
+                include: {
+                    Charges: {
+                        orderBy: {
+                            createdAt: "desc"
+                        }
+                    }
                 }
             }),
             prisma.customer.count(),
@@ -93,7 +107,14 @@ export class CustomerService {
                 where: {
                     id
                 },
-                data
+                data,
+                include: {
+                    Charges: {
+                        orderBy: {
+                            createdAt: "desc"
+                        }
+                    }
+                }
             })
             return updatedCustomer;
         } catch (error) {
@@ -106,14 +127,14 @@ export class CustomerService {
     }
 
     async deleteCustomer(id: string) {
-        const customer = prisma.customer.findUnique({
+        const customer = await prisma.customer.findUnique({
             where: {
                 id
             }
         });
 
         if(!customer) {
-            throw new Error("Cliente não encontrado");
+            throw createError("Cliente não encontrado", 404);
         }
 
         await prisma.customer.delete({
